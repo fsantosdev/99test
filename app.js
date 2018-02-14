@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+
+// Routes Import  
 var index = require('./routes/index');
 var exchanges = require('./routes/exchanges');
 var order_book = require('./routes/order_book');
@@ -22,10 +24,12 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// Routes Expose
 app.use('/', index);
 app.use('/exchanges', exchanges);
 app.use('/order-book', order_book);
@@ -46,6 +50,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.listen('3000', function(){
+	console.log('Application running on localhost:3000');
 });
 
 module.exports = app;
