@@ -135,8 +135,18 @@ router.get('/', function(req, res, next) {
 	var search = req.query.code ? { code: req.query.code } : null;
 
 	ExchangeEntity.find(search, function(err, exchanges) {
+		if (err) 
+			console.log(err);
+
+    })
+    .populate('fees')
+    .exec(function (err, exchanges) {
+		if (err) 
+			console.log(err);
+
+		
 		res.send(exchanges);
-    });
+	});
 });
 
 
