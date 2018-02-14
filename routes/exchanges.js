@@ -65,8 +65,8 @@ var Fee = function(pFee){
 	return new FeeEntity(_constructor);
 }
 
-/* GET exchanges listing. */
-router.get('/get-exchanges', function(req, res, next) {
+/* GET Exchanges Listing. */
+router.get('/import-exchanges', function(req, res, next) {
 	var options = {
 	    uri: 'http://api.bitvalor.com/v1/exchanges.json',
 	    port: 80,
