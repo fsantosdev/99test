@@ -71,9 +71,12 @@ router.get('/import-orderbook', function(req, res, next) {
 			orderBookList = Object.keys(orderBooksObject),
 			AskModel = new Ask(),
 			BidModel = new Bid(),
-			errors = [],
-			imported = [],
-			orderBookTotal = 0;
+			entityModel = null,
+			errors = 0,
+			importedAsk = 0;
+			importedBid = 0;
+			orderBookTotal = 0,
+			timeout = 0;
 
 
 		if(orderBookList.length > 0){
@@ -89,22 +92,45 @@ router.get('/import-orderbook', function(req, res, next) {
 					entityModel.save(function (err, saved) {
 						if (err) {
 							console.warn('Unable to save ', entityModel.exchangeCode , ' in the database');
-							errors.push(saved.exchangeCode)
+							errors++;
 							return console.log(err);
 						}
 
-						console.log(saved.exchangeCode, ' saved to database');
-						imported.push(saved.exchangeCode)
+						orderBookType === 'asks' ? importedAsk++ : importedBids++;
 					});
 				}
 			}
 		}
 
 		var _countListener = setInterval(function(){
-			if((imported.length + errors.length) <= orderBookTotal){
+			var importedSum = importedAsk + importedBid,
+				totalSum = importedSum + errors;
+
+			if(totalSum == orderBookTotal && totalSum > 0){
 				clearInterval(_countListener);
-				res.send('Number of Asks Imported: ' + imported.length + '\nErrors: ' + errors.length); 
+
+				console.log('// Order Book Total', orderBookTotal);
+				console.log('// Imported', importedSum);
+				console.log('// Errors', errors);
+				console.log('// Finished Import');
+
+				res.send(
+					'Number of Asks Imported: ' + importedAsk + '\n' + 
+					'Number of Bids Imported: ' + importedBid + '\n' + 
+					'Errors: ' + errors
+				); 
+			// } else if (timeout < 20  && (imported + errors > 0)){
+			// 	clearInterval(_countListener);
+
+			// 	console.log('// Order Book Total', orderBookTotal);
+			// 	console.log('// Imported', imported);
+			// 	console.log('// Errors', errors);
+			// 	console.log('// Finished Import');
+
+			// 	res.send('Error on importing'); 
 			}
+
+			timeout++;
 		}, 200);
 	});
 });

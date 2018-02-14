@@ -87,7 +87,8 @@ router.get('/import-exchanges', function(req, res, next) {
 			exchangeList = Object.keys(exchangesObject),
 			exchangeModel = new Exchange(),
 			errors = [],
-			imported = [];
+			imported = [],
+			timeout = 0;
 
 
 		if(exchangeList.length > 0){
@@ -123,10 +124,15 @@ router.get('/import-exchanges', function(req, res, next) {
 		}
 
 		var _countListener = setInterval(function(){
-			if((imported.length + errors.length) <= exchangeList.length){
+			if((imported.length + errors.length) == exchangeList.length){
 				clearInterval(_countListener);
 				res.send('Number of Exchanges Imported: ' + imported.length + '\nErrors: ' + errors.length); 
+			} else if (timeout < 10){
+				clearInterval(_countListener);
+				res.send('Error on importing'); 
 			}
+
+			timeout++;
 		}, 200);
 	});
 });
@@ -143,7 +149,6 @@ router.get('/', function(req, res, next) {
     .exec(function (err, exchanges) {
 		if (err) 
 			console.log(err);
-
 		
 		res.send(exchanges);
 	});
