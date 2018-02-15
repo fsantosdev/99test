@@ -11,6 +11,12 @@ var db = mongoose.connection;
 db.on('error', function(){ console.log('Error to connect to database'); });
 db.once('open', function(){ console.log("Connected to database") });
 
+const orderIndex = {
+	'exchangeCode' : 0,
+	'price': 1,
+	'volume': 2
+};
+
 var bidSchema = new mongoose.Schema({
 	info: Array,
 	exchangeCode: String
@@ -119,15 +125,6 @@ router.get('/import-orderbook', function(req, res, next) {
 					'Number of Bids Imported: ' + importedBid + '\n' + 
 					'Errors: ' + errors
 				); 
-			// } else if (timeout < 20  && (imported + errors > 0)){
-			// 	clearInterval(_countListener);
-
-			// 	console.log('// Order Book Total', orderBookTotal);
-			// 	console.log('// Imported', imported);
-			// 	console.log('// Errors', errors);
-			// 	console.log('// Finished Import');
-
-			// 	res.send('Error on importing'); 
 			}
 
 			timeout++;
@@ -136,21 +133,93 @@ router.get('/import-orderbook', function(req, res, next) {
 });
 
 router.get('/', function(req, res, next) {
-	var search = req.query.code ? { code: req.query.code } : null;
+	var exchangeCode = req.query.code,
+		search = exchangeCode ? { info: { "$in" : [exchangeCode]} } : null,
+		askList = [],
+		bidList = [],
+		timeout = 0;
 
-	ExchangeEntity.find(search, function(err, orderBooks) {
-		if (err) 
+	if (!exchangeCode){
+		res.send({
+			'message': 'Favor informar o código da exchange'
+		}); 
+		return;
+	}
+
+	AskEntity.find(search, function(err, asks) {
+		if (err) {
 			console.log(err);
+			return;
+		}
 
-    })
-    .populate('fees')
-    .exec(function (err, orderBooks) {
-		if (err) 
+
+		askList = convertList(asks);
+		console.log(asks.length);
+    });
+
+    BidEntity.find(search, function(err, bids) {
+		if (err) {
 			console.log(err);
+			return;
+		}
 
-		
-		res.send(orderBooks);
-	});
+		bidList = convertList(bids);
+		console.log(bids.length);
+    });
+
+    var convertList = function(list){
+    	var _list = [];
+
+    	if(typeof list == 'object' && list.length >= 0){
+			for(var i = 0; i < list.length; i++){
+				_list.push(
+					convertToOrderAttr(list[i].info)
+				);
+			}
+
+			return _list;
+    	} else {
+    		console.log('Invalid format to: ', list);
+
+    	}
+    }
+
+    var convertToOrderAttr = function(item){
+    	if(typeof item == 'object' && item.length > 0){
+    		return [item[orderIndex.price], item[orderIndex.volume]];
+
+    	} else {
+    		console.log('Invalid format to: ', item);
+
+    	}
+    }
+
+    var _countListener = setInterval(function(){
+		if(askList.length > 0 && bidList.length > 0){
+			clearInterval(_countListener);
+
+			res.send({
+				// 'Number of Asks Imported: ' + askList.length + '\n' + 
+				// 'Number of Bids Imported: ' + bidList.length + '\n'
+				'exchange': exchangeCode,
+				'vendas': askList,
+				'compras': bidList
+			}); 
+
+		} else if (askList.length == 0 && bidList.length == 0 && timeout > 5) {
+			clearInterval(_countListener);
+
+			res.send({
+				// 'Number of Asks Imported: ' + askList.length + '\n' + 
+				// 'Number of Bids Imported: ' + bidList.length + '\n'
+				'exchange': exchangeCode,
+				'vendas': askList,
+				'compras': bidList
+			}); 
+		}
+
+		timeout++;
+	}, 200);
 });
 
 
