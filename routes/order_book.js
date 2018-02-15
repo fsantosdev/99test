@@ -1,15 +1,9 @@
 var express = require('express'),
 	router = express.Router(),
-	request = require('request');
-
-var mongoose = require("mongoose"),
+	request = require('request'),
+	mongoose = require("mongoose"),
 	mongooseSchema = mongoose.Schema;
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/99test');
-var db = mongoose.connection;
-db.on('error', function(){ console.log('Error to connect to database'); });
-db.once('open', function(){ console.log("Connected to database") });
 
 const orderIndex = {
 	'exchangeCode' : 0,

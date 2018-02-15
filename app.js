@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var dotenv = require('dotenv').config();
 
 
 // Routes Import  
@@ -13,6 +14,16 @@ var order_book = require('./routes/order_book');
 
 // Extensions
 // var extensions = require('./utils/extensions');
+
+var mongoose = require("mongoose"),
+  mongooseSchema = mongoose.Schema;
+
+mongoose.Promise = global.Promise;
+mongoose.connect(process.env.DB_HOST);
+var db = mongoose.connection;
+db.on('error', function(){ console.log('Error to connect to database'); });
+db.once('open', function(){ console.log("Connected to database") });
+
 
 var app = express();
 
