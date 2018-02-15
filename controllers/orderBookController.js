@@ -1,4 +1,5 @@
-var	mongoose = require("mongoose");
+var	mongoose = require("mongoose"),
+	request = require('request');
 
 const orderIndex = {
 	'exchangeCode' : 0,

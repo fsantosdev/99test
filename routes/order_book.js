@@ -1,6 +1,5 @@
 var express = require('express'),
-	router = express.Router(),
-	request = require('request');
+	router = express.Router();
 
 // Import Controller
 const orderBookController = require('../controllers/orderBookController');
