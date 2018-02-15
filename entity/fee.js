@@ -12,18 +12,18 @@ var feeSchema = new mongoose.Schema({
 });
 
 var Fee = function(pFee){
-	var _constructor = pFee ? {} : null;
+	this._constructor = pFee ? {} : null;
 
-	if(_constructor){
-		_constructor.in_BRL = pFee.in_BRL;
-		_constructor.in_BTC = pFee.in_BTC;
-		_constructor.out_BRL = pFee.out_BRL;
-		_constructor.out_BTC = pFee.out_BTC;
-		_constructor.trade_book = pFee.trade_book;
-		_constructor.trade_market = pFee.trade_market;
+	if(this._constructor){
+		this._constructor.in_BRL = pFee.in_BRL;
+		this._constructor.in_BTC = pFee.in_BTC;
+		this._constructor.out_BRL = pFee.out_BRL;
+		this._constructor.out_BTC = pFee.out_BTC;
+		this._constructor.trade_book = pFee.trade_book;
+		this._constructor.trade_market = pFee.trade_market;
 	} 
 
-	return new FeeEntity(_constructor);
+	return new FeeEntity(this._constructor);
 }
 
 var FeeEntity = mongoose.model("Fee", feeSchema);

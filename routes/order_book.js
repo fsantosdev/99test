@@ -1,8 +1,7 @@
 var express = require('express'),
 	router = express.Router(),
-	request = require('request'),
-	mongoose = require("mongoose"),
-	mongooseSchema = mongoose.Schema;
+	request = require('request'),	
+	mongoose = require("mongoose");
 
 
 const orderIndex = {
@@ -11,43 +10,11 @@ const orderIndex = {
 	'volume': 2
 };
 
-var bidSchema = new mongoose.Schema({
-	info: Array,
-	exchangeCode: String
-});
+var Bid = require("../entity/bid");
+var Ask = require("../entity/ask");
 
-var askSchema = new mongoose.Schema({
-	info: Array,
-	exchangeCode: String
-});
-
-var AskEntity = mongoose.model("Ask", askSchema);
-var Ask = function(pAsk){
-	var _constructor = pAsk ? {} : null;
-
-	if(pAsk){
-		_constructor.info = pAsk;
-		_constructor.exchangeCode = pAsk[0];
-	}
-
-	_constructor = new AskEntity(_constructor);
-
-	return _constructor;
-}
-
-var BidEntity = mongoose.model("Bid", bidSchema);
-var Bid = function(pBid){
-	var _constructor = pBid ? {} : null;
-
-	if(pBid){
-		_constructor.info = pBid;
-		_constructor.exchangeCode = pBid[0];
-	}
-
-	_constructor = new BidEntity(_constructor);
-
-	return _constructor;
-}
+var BidEntity = mongoose.model("Bid");
+var AskEntity = mongoose.model("Ask");
 
 /* GET Import Order Book listing. */
 router.get('/import-orderbook', function(req, res, next) {
@@ -96,7 +63,7 @@ router.get('/import-orderbook', function(req, res, next) {
 							return console.log(err);
 						}
 
-						orderBookType === 'asks' ? importedAsk++ : importedBids++;
+						orderBookType == 'asks' ? importedAsk++ : importedBids++;
 					});
 				}
 			}
@@ -110,7 +77,6 @@ router.get('/import-orderbook', function(req, res, next) {
 				clearInterval(_countListener);
 
 				console.log('// Order Book Total', orderBookTotal);
-				console.log('// Imported', importedSum);
 				console.log('// Errors', errors);
 				console.log('// Finished Import');
 
@@ -193,8 +159,6 @@ router.get('/', function(req, res, next) {
 			clearInterval(_countListener);
 
 			res.send({
-				// 'Number of Asks Imported: ' + askList.length + '\n' + 
-				// 'Number of Bids Imported: ' + bidList.length + '\n'
 				'exchange': exchangeCode,
 				'vendas': askList,
 				'compras': bidList
@@ -204,8 +168,6 @@ router.get('/', function(req, res, next) {
 			clearInterval(_countListener);
 
 			res.send({
-				// 'Number of Asks Imported: ' + askList.length + '\n' + 
-				// 'Number of Bids Imported: ' + bidList.length + '\n'
 				'exchange': exchangeCode,
 				'vendas': askList,
 				'compras': bidList

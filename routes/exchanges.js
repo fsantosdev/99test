@@ -1,8 +1,7 @@
 var express = require('express'),
 	router = express.Router(),
 	request = require('request'),
-	mongoose = require("mongoose"),
-  	mongooseSchema = mongoose.Schema;
+	mongoose = require("mongoose");
 
 // Import Model dependencies
 var Exchange = require('../entity/exchange');

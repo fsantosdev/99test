@@ -14,22 +14,22 @@ var exchangeSchema = new mongoose.Schema({
 var ExchangeEntity = mongoose.model("Exchange", exchangeSchema);
 
 var Exchange = function(pExchange){
-	var _constructor = pExchange ? {} : null;
+	this._constructor = pExchange ? {} : null;
 
 	if(pExchange){
-		_constructor.code = pExchange.code;
-		_constructor.name = pExchange.name;
-		_constructor.url = pExchange.url;
-		_constructor.book = pExchange.book || pExchange.url_book;
+		this._constructor.code = pExchange.code;
+		this._constructor.name = pExchange.name;
+		this._constructor.url = pExchange.url;
+		this._constructor.book = pExchange.book || pExchange.url_book;
 
 		if(pExchange.fees){
-			_constructor.fees = new Fee(pExchange.fees);
+			this._constructor.fees = new Fee(pExchange.fees);
 		}
 	}
 
-	_constructor = new ExchangeEntity(_constructor);
+	this._constructor = new ExchangeEntity(this._constructor);
 
-	return _constructor;
+	return this._constructor;
 }
 
 module.exports = Exchange;
